@@ -4,6 +4,8 @@
 
 > 不是"套模板拼字符串"，而是把 WorkBuddy 真正用的那段 `enhance-prompt-system-prompt` 逐字搬过来，走一次无工具的模型调用。语言跟随、约 800 字、只输出提示词本身——这些行为都来自那段模板本身。
 
+![输入框右侧工具栏里的「增强提示词」火花按钮（发送键左侧）](assets/composer-enhance-button.png)
+
 ---
 
 ## 一、功能简介
@@ -201,6 +203,7 @@ WorkBuddy 桌面版里，增强不是前端魔法，而是三段拼起来的：
 
 ```
 dsh-prompt-enhance/
+├── assets/             # 截图
 ├── index.js            # Host：HTTP 路由、模型路由解析、流式收流、输出清洗
 ├── system-prompt.js    # 逐字搬运的 WorkBuddy 增强模板
 ├── client.js           # Client：输入框按钮 + 四态状态机
