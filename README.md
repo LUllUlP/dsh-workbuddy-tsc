@@ -1,10 +1,10 @@
-# 提示词增强 · prompt-enhance（DSH 插件）
+# dsh-workbuddy-tsc · WorkBuddy 提示词增强（DSH 插件）
 
 ![输入框右侧工具栏里的「增强提示词」火花按钮（发送键左侧）](assets/composer-enhance-button.png)
 
 ## 插件简介
 
-**名称**：提示词增强 · `@local/prompt-enhance` —— 把 WorkBuddy 桌面版输入框的「一键增强提示词」搬进 DeepSeek Harness：草稿一键改写、可还原、可取消。
+**名称**：`dsh-workbuddy-tsc`（WorkBuddy 提示词增强） —— 把 WorkBuddy 桌面版输入框的「一键增强提示词」搬进 DeepSeek Harness：草稿一键改写、可还原、可取消。
 
 ### 核心功能
 
@@ -35,11 +35,11 @@
 ### 安装与使用概览
 
 ```bash
-git clone https://github.com/qjkwjashdadwq/dsh-prompt-enhance.git
+git clone https://github.com/qjkwjashdadwq/dsh-workbuddy-tsc.git
 ```
 
 ```
-plugin_manager(action="install_bundle", target="D:\\path\\dsh-prompt-enhance")
+plugin_manager(action="install_bundle", target="D:\\path\\dsh-workbuddy-tsc")
 ```
 
 刷新 Web UI → 输入框右侧出现火花按钮 → 写草稿、点击增强 → 不满意再点还原。详细步骤见下文「安装与启用」。
@@ -74,38 +74,38 @@ plugin_manager(action="install_bundle", target="D:\\path\\dsh-prompt-enhance")
 ### 方式 A：从仓库目录安装（推荐）
 
 ```bash
-git clone https://github.com/qjkwjashdadwq/dsh-prompt-enhance.git
+git clone https://github.com/qjkwjashdadwq/dsh-workbuddy-tsc.git
 ```
 
 然后在 DSH 里执行（路径换成你本机的实际路径）：
 
 ```
-plugin_manager(action="install_bundle", target="D:\\path\\dsh-prompt-enhance")
+plugin_manager(action="install_bundle", target="D:\\path\\dsh-workbuddy-tsc")
 ```
 
 ### 方式 B：打包成 tgz 再装
 
 ```bash
-cd dsh-prompt-enhance
-npm pack          # 产出 local-prompt-enhance-1.0.0.tgz
+cd dsh-workbuddy-tsc
+npm pack          # 产出 dsh-workbuddy-tsc-1.0.0.tgz
 ```
 
 ```
-plugin_manager(action="install_bundle", target="D:\\path\\local-prompt-enhance-1.0.0.tgz")
+plugin_manager(action="install_bundle", target="D:\\path\\dsh-workbuddy-tsc-1.0.0.tgz")
 ```
 
 ### 启用校验
 
 1. `plugin_manager` 返回 `application: applied`；
-2. 插件列表出现 **提示词增强 / Prompt Enhance**；
+2. 插件列表出现 **WorkBuddy 提示词增强 (dsh-workbuddy-tsc)**；
 3. **刷新 Web UI 页面**（新客户端模块需重连加载）；
 4. 输入框右侧出现火花按钮，输入内容后由灰变亮。
 
 ### 停用与卸载
 
 ```
-plugin_manager(action="set_plugin", target="@local/prompt-enhance", enabled=false)   # 临时停用
-plugin_manager(action="remove_bundle", target="@local/prompt-enhance")                # 彻底移除
+plugin_manager(action="set_plugin", target="dsh-workbuddy-tsc", enabled=false)   # 临时停用
+plugin_manager(action="remove_bundle", target="dsh-workbuddy-tsc")                # 彻底移除
 ```
 
 ---
@@ -122,8 +122,8 @@ plugin_manager(action="remove_bundle", target="@local/prompt-enhance")          
 
 ```yaml
 - insert:
-    - id: prompt-enhance
-      name: '@local/prompt-enhance'
+    - id: dsh-workbuddy-tsc
+      name: 'dsh-workbuddy-tsc'
       config:
         temperature: 0.5
         maxTextChars: 20000
@@ -188,7 +188,7 @@ plugin_manager(action="remove_bundle", target="@local/prompt-enhance")          
 用会话默认模型。也可在请求体里带 `provider` / `model` 覆盖（接口级用法）：
 
 ```bash
-curl -s -X POST http://127.0.0.1:1144/plugins/prompt-enhance/enhance \
+curl -s -X POST http://127.0.0.1:1144/plugins/dsh-workbuddy-tsc/enhance \
   -H 'content-type: application/json' \
   --data '{"text":"写个贪吃蛇","provider":"PROVIDER","model":"MODEL"}'
 ```
@@ -217,7 +217,7 @@ WorkBuddy 桌面版里，增强不是前端魔法，而是三段拼起来的：
 
 | WorkBuddy | 本插件 |
 | --- | --- |
-| `llm:enhancePrompt` IPC + daemon | Host `POST /plugins/prompt-enhance/enhance` → `ctx.llm.stream()` |
+| `llm:enhancePrompt` IPC + daemon | Host `POST /plugins/dsh-workbuddy-tsc/enhance` → `ctx.llm.stream()` |
 | 当前会话模型 | `ctx.get('agentDefaultModel').currentSelection()` |
 | 输入框文本块 | 客户端 `useInput((s) => s.draft)` |
 | 替换文本块 | `inputActions.setDraft(text)` |
@@ -232,7 +232,7 @@ WorkBuddy 桌面版里，增强不是前端魔法，而是三段拼起来的：
 ## 目录结构
 
 ```
-dsh-prompt-enhance/
+dsh-workbuddy-tsc/
 ├── assets/             # 截图
 ├── index.js            # Host：HTTP 路由、模型路由解析、流式收流、输出清洗
 ├── system-prompt.js    # 逐字搬运的 WorkBuddy 增强模板

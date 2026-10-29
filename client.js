@@ -1,5 +1,5 @@
 /**
- * Client half of the prompt-enhance bundle.
+ * Client half of the dsh-workbuddy-tsc bundle.
  *
  * Renders WorkBuddy's composer "enhance prompt" control beside the submit
  * action and reproduces its state machine against this Harness's draft API:
@@ -12,12 +12,12 @@
  * attachments stay attached, matching WorkBuddy's text-block-only rewrite.
  */
 window.__ModuleLoader__.load({
-	id: '@local/prompt-enhance',
+	id: 'dsh-workbuddy-tsc',
 	factory(require) {
 		const React = require('react');
 		const h = React.createElement;
 
-		const ENDPOINT = '/plugins/prompt-enhance/enhance';
+		const ENDPOINT = '/plugins/dsh-workbuddy-tsc/enhance';
 		const MIN_TEXT_LENGTH = 1;
 
 		const zh = typeof navigator !== 'undefined' && /^zh/i.test(navigator.language || '');
@@ -245,7 +245,7 @@ window.__ModuleLoader__.load({
 
 			return h('button', {
 				type: 'button',
-				'data-prompt-enhance': status,
+				'data-dsh-workbuddy-tsc': status,
 				title: label,
 				'aria-label': label,
 				disabled,
@@ -263,7 +263,7 @@ window.__ModuleLoader__.load({
 			apply(ctx) {
 				ctx.slots.inject('conversation.input.right', () => ctx.slots.register({
 					name: 'conversation.input.right',
-					id: 'prompt-enhance',
+					id: 'dsh-workbuddy-tsc',
 					order: 35
 				}, EnhanceControl));
 			}

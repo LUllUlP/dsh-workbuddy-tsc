@@ -1,5 +1,5 @@
 /**
- * Host half of the prompt-enhance bundle.
+ * Host half of the dsh-workbuddy-tsc bundle.
  *
  * Ports WorkBuddy Desktop's "enhance prompt" mechanism: one tools-less model
  * call whose system prompt is the shipped `enhance-prompt-system-prompt`, whose
@@ -14,11 +14,11 @@
  */
 import { SYSTEM_PROMPT } from './system-prompt.js';
 
-export const name = 'prompt-enhance';
+export const name = 'dsh-workbuddy-tsc';
 export const inject = ['llm', 'webServer'];
 
 /** Exact-path browser route; matches the constant the Client module fetches. */
-export const ENDPOINT = '/plugins/prompt-enhance/enhance';
+export const ENDPOINT = '/plugins/dsh-workbuddy-tsc/enhance';
 
 const MAX_BODY_BYTES = 256 * 1024;
 const MAX_TEXT_CHARS = 32_000;
@@ -35,7 +35,7 @@ export function apply(ctx, config) {
 		kind: 'exact',
 		path: ENDPOINT,
 		handler: (req, res) => handle(ctx, settings, req, res)
-	}), 'prompt-enhance: enhance endpoint');
+	}), 'dsh-workbuddy-tsc: enhance endpoint');
 }
 
 async function handle(ctx, settings, req, res) {
