@@ -1,30 +1,70 @@
 # 提示词增强 · prompt-enhance（DSH 插件）
 
-把 WorkBuddy 桌面版输入框里那颗**「一键增强提示词」**按钮搬进 DeepSeek Harness：草稿写得潦草，点一下火花按钮，它就把你的一句话扩写成一条结构清晰、约束明确的提示词，不满意再点一下还原。
-
-> 不是"套模板拼字符串"，而是把 WorkBuddy 真正用的那段 `enhance-prompt-system-prompt` 逐字搬过来，走一次无工具的模型调用。语言跟随、约 800 字、只输出提示词本身——这些行为都来自那段模板本身。
-
 ![输入框右侧工具栏里的「增强提示词」火花按钮（发送键左侧）](assets/composer-enhance-button.png)
 
----
+## 插件简介
 
-## 一、功能简介
+**名称**：提示词增强 · `@local/prompt-enhance` —— 把 WorkBuddy 桌面版输入框的「一键增强提示词」搬进 DeepSeek Harness：草稿一键改写、可还原、可取消。
 
-| 能力 | 说明 |
+### 核心功能
+
+- **一键改写**：读当前草稿 → 单次无工具模型调用 → 原地替换文本
+- **三种可逆操作**：增强；取消（转圈时再点一次）；还原（成功后图标变撤销箭头）
+- **语言跟随**：中文进中文出、英文进英文出（模板最高优先级约束）
+- **输出清洗**：剥掉代码围栏、`Enhanced prompt:` / `优化后的提示词：` 之类前缀、包裹引号，只回提示词正文
+- **分歧保护**：增强成功后你若继续编辑，还原点自动失效，不会覆盖新写的内容
+
+### 适用场景
+
+- 需求只有一句话、但要它一次做对：`写个贪吃蛇` → 带验收条件、边界与输出格式的完整需求
+- 口语化转可执行：把随口一句整理成有明确约束和结构的指令
+- 跨语言 / 换语气：翻译式改写，或改得更正式、更简短，便于贴给同事或写进文档
+- **不适合**：本就写得很细的提示词（模板会压缩冗余，可能删掉你要的细节）；需要读文件、跑命令的复杂任务（本插件只改文本，不执行）
+
+### 主要特性
+
+| 特性 | 说明 |
 | --- | --- |
-| 一键增强 | 读取当前输入框草稿 → 交模型改写 → 原地替换 |
-| 可还原 | 增强成功后图标变撤销箭头，点一下恢复原稿 |
-| 可取消 | 转圈时再点一次即中止，草稿保持原样 |
-| 语言跟随 | 中文进中文出、英文进英文出（模板最高优先级约束） |
-| 尊重边界 | 只改写、不替你答；不擅自塞技术栈；不索要代码片段 |
-| 内容变了就失效 | 增强后你若继续编辑，还原点自动丢弃，避免误覆盖 |
-| 零额外依赖 | Host 只注入 `llm` + `webServer`，Client 只用 `react` + `slots` |
+| 原理一致 | 逐字搬运 WorkBuddy 的 `enhance-prompt-system-prompt`（工具为空的子代理 + 约 3 KB 模板），非自造模板 |
+| 模型无关 | 走当前会话的默认模型路由，不绑定厂商；请求体可覆盖 `provider` / `model` |
+| 零额外依赖 | Host 只注入 `llm` + `webServer`，Client 只用 `react` + `slots`，无原生模块 |
+| 原生 UI 集成 | 注册进 `conversation.input.right` 槽位，与发送键同排，不遮挡编辑器与附件栏 |
+| 全本地链路 | 草稿只经过本机 DSH 的模型路由，与 WorkBuddy 客户端/服务端无任何通信 |
+| 可换提示词 | 配置 `systemPrompt` 即整段替换改写策略，风格、语言、长度自定义 |
 
-按钮位置：输入框右侧工具栏，**发送键左边**（`conversation.input.right`，order 35）。
+### 安装与使用概览
+
+```bash
+git clone https://github.com/qjkwjashdadwq/dsh-prompt-enhance.git
+```
+
+```
+plugin_manager(action="install_bundle", target="D:\\path\\dsh-prompt-enhance")
+```
+
+刷新 Web UI → 输入框右侧出现火花按钮 → 写草稿、点击增强 → 不满意再点还原。详细步骤见下文「安装与启用」。
+
+### 兼容性
+
+| 项 | 说明 |
+| --- | --- |
+| Harness | DeepSeek Harness 桌面版 + Web UI；依赖 `@deepseek-ai/dsh-client-ui-conversation` 的槽位标准属性（`useInput`、`inputActions.setDraft`） |
+| 运行平台 | Windows / macOS / Linux，纯 JS，无原生编译 |
+| 模型 | 任何经 DSH `llm` 服务可用的 provider |
+| 未覆盖 | 移动端 H5、CLI/TUI 等无输入框槽位的客户端形态 |
+
+### 注意事项
+
+- 增强会**覆盖当前草稿**：有还原点，但增强后继续编辑即失效
+- 每次点击 = 一次模型调用，按你的 provider 计费
+- 约 800 字是模板自带约束，不是插件硬截断
+- 内联 @ 引用会被清空，附件（图片/文件）保留
+- `systemPrompt` 覆盖后，WorkBuddy 原始改写行为不再保证
+- `system-prompt.js` 含 WorkBuddy 提示词原文，版权归原权利人，仅作互操作与技术研究用途
 
 ---
 
-## 二、安装与启用
+## 安装与启用
 
 ### 前置条件
 
@@ -70,7 +110,7 @@ plugin_manager(action="remove_bundle", target="@local/prompt-enhance")          
 
 ---
 
-## 三、关键配置项
+## 关键配置项
 
 配置写在 profile 的 `cordis.patch.yml` 条目的 `config` 里；不写则全部用默认值。
 
@@ -94,7 +134,7 @@ plugin_manager(action="remove_bundle", target="@local/prompt-enhance")          
 
 ---
 
-## 四、使用示例
+## 使用示例
 
 以下为**真实调用结果**（默认模型、默认配置）。
 
@@ -124,7 +164,7 @@ plugin_manager(action="remove_bundle", target="@local/prompt-enhance")          
 
 ---
 
-## 五、常见问题
+## 常见问题
 
 **Q1 刷新后没有看到按钮？**
 先确认 `install_bundle` 返回的是 `application: applied`（不是 `restart-required`），再确认页面已**整页刷新**。若仍没有，检查插件是否被停用（`enabled=false`）。
@@ -161,17 +201,7 @@ curl -s -X POST http://127.0.0.1:1144/plugins/prompt-enhance/enhance \
 
 ---
 
-## 六、注意事项
-
-- **会覆盖草稿**：增强成功即原地替换；点击撤销箭头可还原，但增强后再编辑会丢弃还原点。
-- **每次点击 = 一次模型调用**，按你的 provider 计费；长草稿输入 token 也计入。
-- **长度约 800 字**是模板自带约束，不是插件硬截断；短草稿可能被扩写明显变长，属预期行为。
-- **模板可被整体替换**（`systemPrompt`），替换后 WorkBuddy 的原始行为不再保证。
-- 本仓库的 `system-prompt.js` 含 WorkBuddy 客户端内的提示词原文，**版权归原权利人**，此处仅作互操作与技术研究用途；如需商用请自行评估授权。
-
----
-
-## 七、工作原理（可选阅读）
+## 工作原理（可选阅读）
 
 WorkBuddy 桌面版里，增强不是前端魔法，而是三段拼起来的：
 
@@ -199,7 +229,7 @@ WorkBuddy 桌面版里，增强不是前端魔法，而是三段拼起来的：
 
 ---
 
-## 八、目录结构
+## 目录结构
 
 ```
 dsh-prompt-enhance/
@@ -215,6 +245,6 @@ dsh-prompt-enhance/
 
 ---
 
-## 九、许可
+## 许可
 
 代码部分以 MIT 许可发布；`system-prompt.js` 内嵌提示词文本的版权归原权利人，见上文注意事项。
